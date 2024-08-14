@@ -1,3 +1,4 @@
+# Helpful commands
 sudo apt update
 sudo apt-get install jq
 snap install google-cloud-cli --classic
