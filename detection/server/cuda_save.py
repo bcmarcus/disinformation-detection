@@ -41,7 +41,7 @@ app = Flask(__name__)
 
 # Login to Hugging Face
 logger.info("Logging in to Hugging Face...")
-login('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')
+login(YOUR_HUGGING_FACE_ACCESS_TOKEN_HERE)
 
 # Load the tokenizer and model for gemma-2-2b-it or gemma-2-9b-it
 logger.info("Loading tokenizer and model...")
