@@ -11,13 +11,12 @@ sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker $USER
 
-# sudo mkdir -p /opt/google/cuda-installer
-# cd /opt/google/cuda-installer/ || exit
-# sudo curl -fSsL -O https://github.com/GoogleCloudPlatform/compute-gpu-installation/releases/download/cuda-installer-v1.1.0/cuda_installer.pyz
-# sudo python3 cuda_installer.pyz install_driver
-# sudo python3 cuda_installer.pyz install_cuda
-# sudo python3 cuda_installer.pyz verify_cuda
-sudo mkdir /tmp/server/
+sudo mkdir -p /opt/google/cuda-installer
+cd /opt/google/cuda-installer/ || exit
+sudo curl -fSsL -O https://github.com/GoogleCloudPlatform/compute-gpu-installation/releases/download/cuda-installer-v1.1.0/cuda_installer.pyz
+sudo python3 cuda_installer.pyz install_driver
+sudo python3 cuda_installer.pyz install_cuda
+sudo python3 cuda_installer.pyz verify_cuda
 
 # Wait for Docker to be ready
 while ! docker info > /dev/null 2>&1; do
@@ -27,9 +26,8 @@ done
 
 # Build and run the ML server container
 sudo docker build -t ml-server:latest -f /tmp/cuda.dockerfile .
-sudo docker run -d --gpus all -p 5000:5000 ml-server:latest
-
 sudo systemctl restart docker
+sudo docker run -d --gpus all -p 5000:5000 ml-server:latest
 
 # Create a marker file to indicate the startup script has completed
 sudo touch /var/log/startup-script-complete

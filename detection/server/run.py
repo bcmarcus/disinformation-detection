@@ -76,6 +76,17 @@ def backup_prediction():
         "links": random.choice([singleLinkConfig, doubleLinkConfig])
     }
 
+def get_score(answer):
+    score_map = {
+        "True": 100,
+        "Mostly True": 75,
+        "Somewhat True": 50,
+        "Mostly False": 25,
+        "False": 0,
+        "Not Applicable": 100
+    }
+    return score_map.get(answer, 0)  # Default to 0 if answer is not in the map
+
 @app.route('/health', methods=['GET'])
 def health_check():
     logger.info("Run health check requested")
@@ -105,13 +116,22 @@ def predict():
         response = requests.post(f"{LLM_HANDLER_URL}/predict", json=data, timeout=60)
         response.raise_for_status()
         result = response.json()
-        logger.info(f"Predict endpoint result: {result}")
+        
+        # Get the score based on the answer
+        if 'answer' in result:
+            score = get_score(result['answer'])
+            result['score'] = score
+            logger.info(f"Assigned score {score} based on answer {result['answer']}")
+        else:
+            logger.warning("No 'answer' field found in LLM handler response")
+
         return jsonify(result), 200
     except requests.exceptions.RequestException as e:
         logger.error(f"Error in predict endpoint: {str(e)}", exc_info=True)
         result = backup_prediction()
         logger.info(f"Using backup prediction: {result}")
         return jsonify(result), 200
+
 
 @app.route('/isFalse', methods=['POST'])
 def is_false():

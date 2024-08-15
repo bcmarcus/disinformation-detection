@@ -96,8 +96,7 @@ if [ -z "$INSTANCE_EXISTS" ]; then
     --boot-disk-size=200GB \
     --image-family=ubuntu-2204-lts \
     --image-project=ubuntu-os-cloud \
-    --metadata="install-nvidia-driver=True" \
-    --metadata-from-file startup-script=gpu_startup_script.sh
+    --metadata="install-nvidia-driver=True" 
 
     echo "ML server instance created successfully: $GCE_INSTANCE_NAME"
     if [ "$ML_INSTANCE_STATUS" != "recreated" ]; then
@@ -131,13 +130,22 @@ if [ -z "$INSTANCE_EXISTS" ]; then
     echo "Copying Docker image to instance..."
     gcloud compute scp cuda.dockerfile $GCE_INSTANCE_NAME:/tmp/cuda.dockerfile --zone=$GCE_ZONE
     gcloud compute scp env.yml $GCE_INSTANCE_NAME:/tmp/env.yml --zone=$GCE_ZONE
-    gcloud compute scp server/cuda.py $GCE_INSTANCE_NAME:/tmp/server/cuda.py --zone=$GCE_ZONE
+    gcloud compute scp gpu_startup_script.sh $GCE_INSTANCE_NAME:/tmp/gpu_startup_script.sh --zone=$GCE_ZONE
+    gcloud compute scp server/cuda.py $GCE_INSTANCE_NAME:/tmp/cuda.py --zone=$GCE_ZONE
+    gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo mkdir /tmp/server/"
+    gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo mv /tmp/cuda.py /tmp/server/cuda.py"
+    gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo bash /tmp/gpu_startup_script.sh"
 
     echo "ML server deployed and container started on GCE instance: $GCE_INSTANCE_NAME"
 else
     echo "GCE instance $GCE_INSTANCE_NAME already exists. Skipping creation."
     ML_INSTANCE_STATUS="already existed"
 fi
+
+# gcloud compute scp cuda.dockerfile $GCE_INSTANCE_NAME:/tmp/cuda.dockerfile --zone=$GCE_ZONE
+# gcloud compute scp env.yml $GCE_INSTANCE_NAME:/tmp/env.yml --zone=$GCE_ZONE
+# gcloud compute scp server/cuda.py $GCE_INSTANCE_NAME:/tmp/cuda.py --zone=$GCE_ZONE
+# gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo mv /tmp/cuda.py /tmp/server/cuda.py"
 
 # Function to get the external IP of the GCE instance
 get_gce_external_ip() {
