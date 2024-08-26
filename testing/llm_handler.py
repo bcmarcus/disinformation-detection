@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Login to Hugging Face
-login('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')
+login(YOUR_HUGGING_FACE_ACCESS_TOKEN_HERE)
 
 # Define the output schema using pydantic
 class Weather(BaseModel):
