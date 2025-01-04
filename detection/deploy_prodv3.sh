@@ -128,10 +128,10 @@ if [ -z "$INSTANCE_EXISTS" ]; then
 
     # Copy the Docker image to the instance
     echo "Copying Docker image to instance..."
-    gcloud compute scp cuda.dockerfile $GCE_INSTANCE_NAME:/tmp/cuda.dockerfile --zone=$GCE_ZONE
+    gcloud compute scp detection/cuda.dockerfile $GCE_INSTANCE_NAME:/tmp/cuda.dockerfile --zone=$GCE_ZONE
     gcloud compute scp env.yml $GCE_INSTANCE_NAME:/tmp/env.yml --zone=$GCE_ZONE
-    gcloud compute scp gpu_startup_script.sh $GCE_INSTANCE_NAME:/tmp/gpu_startup_script.sh --zone=$GCE_ZONE
-    gcloud compute scp server/cuda.py $GCE_INSTANCE_NAME:/tmp/cuda.py --zone=$GCE_ZONE
+    gcloud compute scp detection/gpu_startup_script.sh $GCE_INSTANCE_NAME:/tmp/gpu_startup_script.sh --zone=$GCE_ZONE
+    gcloud compute scp detection/server/cuda.py $GCE_INSTANCE_NAME:/tmp/cuda.py --zone=$GCE_ZONE
     gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo mkdir /tmp/server/"
     gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo mv /tmp/cuda.py /tmp/server/cuda.py"
     gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo bash /tmp/gpu_startup_script.sh"
@@ -141,11 +141,6 @@ else
     echo "GCE instance $GCE_INSTANCE_NAME already exists. Skipping creation."
     ML_INSTANCE_STATUS="already existed"
 fi
-
-# gcloud compute scp cuda.dockerfile $GCE_INSTANCE_NAME:/tmp/cuda.dockerfile --zone=$GCE_ZONE
-# gcloud compute scp env.yml $GCE_INSTANCE_NAME:/tmp/env.yml --zone=$GCE_ZONE
-# gcloud compute scp server/cuda.py $GCE_INSTANCE_NAME:/tmp/cuda.py --zone=$GCE_ZONE
-# gcloud compute ssh $GCE_INSTANCE_NAME --zone=$GCE_ZONE --command "sudo mv /tmp/cuda.py /tmp/server/cuda.py"
 
 # Function to get the external IP of the GCE instance
 get_gce_external_ip() {
